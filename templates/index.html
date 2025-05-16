@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Start AI Interview{% endblock %}
+
+{% block content %}
+    <h1>AI Interview Bot</h1>
+    <p>Welcome! Please select a job role to start your mock interview.</p>
+    
+    <form method="POST" action="{{ url_for('start_interview_route') }}">
+        <div class="form-group">
+            <label for="job_role">Select Job Role:</label>
+            <select name="job_role" id="job_role" class="form-control" required>
+                <option value="">-- Select a Role --</option>
+                {% for role in available_roles %}
+                    <option value="{{ role }}">{{ role }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Start Interview</button> {# Added btn-block for full width #}
+    </form>
+    
+    <div class="footer-links mt-4">
+        <a href="{{ url_for('reset_interview') }}">Reset Current Session</a>
+    </div>
+{% endblock %}

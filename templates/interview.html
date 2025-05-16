@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Interview for {{ job_role }}{% endblock %}
+
+{% block content %}
+    <h2>Interview: {{ job_role }}</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-info btn-sm mb-3">Change Role / New Interview</a>
+    <hr>
+
+    <div id="interview-log">
+        {% if not past_q_and_a and not current_question and not all_questions_answered %}
+            <p>Preparing your first question...</p>
+        {% endif %}
+        {% for item in past_q_and_a %}
+            <div class="chat-bubble question-bubble">
+                <strong>Question:</strong> {{ item.question }}
+            </div>
+            <div class="chat-bubble answer-bubble">
+                <strong>Your Answer:</strong> {{ item.answer }}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if current_question %}
+        <div class="current-question-area mt-3">
+            <div class="chat-bubble question-bubble">
+                <strong>Current Question:</strong> {{ current_question }}
+            </div>
+            <form method="POST" action="{{ url_for('interview_page') }}" class="mt-3">
+                <div class="form-group">
+                    <label for="answer" class="sr-only">Your Answer:</label> {# sr-only for accessibility if label is visually hidden #}
+                    <textarea name="answer" id="answer" class="form-control" rows="4" placeholder="Type your answer here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Submit Answer</button> {# Added btn-block #}
+            </form>
+        </div>
+    {% elif all_questions_answered and evaluation %}
+        <div class="mt-4">
+            <h3>Interview Complete!</h3>
+            {% if evaluation.startswith("Error:") %}
+                <div class="alert alert-danger">
+                    <h4>Evaluation Failed</h4>
+                    <p>{{ evaluation }}</p>
+                </div>
+            {% else %}
+                <div class="evaluation">
+                    <h4>Evaluation Result:</h4>
+                    <p>{{ evaluation }}</p>
+                </div>
+            {% endif %}
+        </div>
+    {% elif all_questions_answered and not evaluation and error_message %}
+         <div class="alert alert-danger mt-3">
+            <h4>Problem during Evaluation</h4>
+            <p>{{ error_message }}</p>
+        </div>
+    {% elif not questions and error_message %}
+         <div class="alert alert-danger mt-3">
+            <h4>Problem Preparing Interview</h4>
+            <p>{{ error_message }}</p>
+            <p>Please try starting a new interview.</p>
+        </div>
+    {% elif not current_question and not all_questions_answered and questions %}
+        <p class="mt-3">Loading next question or processing...</p>
+    {% endif %}
+    
+    <div class="footer-links mt-4">
+        <a href="{{ url_for('reset_interview') }}">Reset This Interview</a>
+    </div>
+
+{% endblock %}
